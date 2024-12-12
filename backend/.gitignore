@@ -1,0 +1,41 @@
+# Logs
+logs
+*.log
+npm-debug.log*
+
+# Dependency directories
+node_modules/
+
+# Environment files
+.env
+
+# Build output
+dist/
+build/
+
+# Operating system files
+.DS_Store
+Thumbs.db
+
+# IDE/editor-specific files
+.vscode/
+.idea/
+
+# Miscellaneous
+*.swp
+*.bak
+*.tmp
+*.temp
+
+# Testing files
+coverage/
+.nyc_output/
+
+# Database files
+*.sqlite
+*.sqlite3
+*.db
+*.db-journal
+
+# Docker-related
+docker-compose.override.yml
