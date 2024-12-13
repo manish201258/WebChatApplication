@@ -82,6 +82,8 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
+ 
+
 
 // User Manage
 const deleteConversation = async(id) => {
@@ -92,7 +94,6 @@ const deleteConversation = async(id) => {
   })
   .then(()=>{
     setClicked(null)
-    userSideData();
   })
 }
 const blockConversation = async (id) => {

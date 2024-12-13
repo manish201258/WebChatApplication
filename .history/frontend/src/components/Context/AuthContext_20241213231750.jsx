@@ -82,6 +82,10 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
+  // useEffect(()=>{
+  //   sideClicked(null)
+  // },[])
+
 
 // User Manage
 const deleteConversation = async(id) => {

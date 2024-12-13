@@ -83,6 +83,7 @@ export const AuthProvider = ({ children }) => {
   };
 
 
+
 // User Manage
 const deleteConversation = async(id) => {
   await axios.post(`${BaseUrl}/deleteconversation/${id}`,{},{
@@ -92,7 +93,6 @@ const deleteConversation = async(id) => {
   })
   .then(()=>{
     setClicked(null)
-    userSideData();
   })
 }
 const blockConversation = async (id) => {

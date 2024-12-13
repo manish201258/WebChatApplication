@@ -64,9 +64,8 @@ const ChatContact = () => {
 
   // Fetch user data when component mounts or user data changes
   useEffect(() => {
-    // sideUser();
-     userSideData();
-  }, [addUserUID,clicked]);
+    if (currentUser) userSideData();
+  }, [addUserUID,clicked,]);
 
   return (
     <>
