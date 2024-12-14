@@ -7,7 +7,7 @@ import BaseUrl from '../BaseUrl';
 import Loader from '../miscellaneous/Loader';
 
 const UserRegister = () => {
-  const {loading,setloading} = UseAuth()
+  const {loading,setLoading} = UseAuth()
   const [formData, setFormData] = useState({
     username: '',
     email: '',
@@ -27,19 +27,27 @@ const UserRegister = () => {
     try {
       await axios.post(`${BaseUrl}/register`, formData)
       .then((res)=>{
-        setloading(true)
-          if(res.status===201)
-            toast("Register Success! Now Login.")
-      }) 
+        setLoading(true);
+        if (res.status === 201) {
+          toast.success("Register Success");
+        } else if (res.status === 400) {
+          toast.error("Provide all details!");
+        } else if (res.status === 403) {
+          toast.warn("Credentials already exist!");
+        } else if (res.status === 500) {
+          toast.warn("Server issue");
+        }
+      })
+  
+      
     } catch (error) {
-      console.log("clint side error in register")
+      console.log("Client-side error in register:", error);
+      toast.error("Registration failed. Please try again.");
+    } finally {
+      setLoading(false);
     }
-    finally{
-      setloading(false)
-    }
-    
-
   };
+  
 
   return (
     <div className="register-container">

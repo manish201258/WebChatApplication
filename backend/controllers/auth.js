@@ -14,16 +14,15 @@ const register = async (req, res) => {
             return res.status(400).json({ message: "Please provide all required fields" });
         }
 
-        const userNameExist = await User.findOne({ username });
-        const userExist = await User.findOne({ email });
+        const userExist = await User.findOne({ email:email });
 
-        if (userExist || userNameExist) {
+        if (userExist) {
             return res.status(403).json({ message: "Credentials already exist" });
         }
 
         const hash_pass = await bcrypt.hash(password, 10);
 
-        const uniqueId = shortid.generate();
+        const uniqueId =shortid.generate();
 
         const userCreate = await User.create({
             username,
@@ -62,7 +61,7 @@ const login = async (req, res) => {
             return res.status(403).json({ message: "Invalid Credentials" });
         }
 
-        res.status(201).json({
+        return res.status(201).json({
             message: "User Logged In",
             token: generateToken(userExist._id, userExist.email)
         });
