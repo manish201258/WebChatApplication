@@ -212,7 +212,7 @@ const UserCard = ({ user, clicked, sideClicked, isOnline, deleteConversation }) 
           className="profile position-relative"
           style={{
             backgroundImage:
-              "url('https://static.vecteezy.com/system/resources/previews/034/324/148/large_2x/front-view-of-an-animated-boy-standing-wearing-tshirt-character-design-free-photo.jpeg')",
+              "url('https://static.vecteezy.com/system/resources/previews/030/694/430/non_2x/top-2d-cartoon-vector-illustration-on-white-background-hig-free-photo.jpg')",
             backgroundSize: "contain",
           }}
         >

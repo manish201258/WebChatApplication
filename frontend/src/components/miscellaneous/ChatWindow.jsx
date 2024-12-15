@@ -76,7 +76,7 @@ const ChatWindow = () => {
                         className="profile-photo"
                         style={{
                           backgroundImage:
-                            "URL('https://static.vecteezy.com/system/resources/previews/034/324/148/large_2x/front-view-of-an-animated-boy-standing-wearing-tshirt-character-design-free-photo.jpeg')",
+                            "URL('https://static.vecteezy.com/system/resources/previews/030/694/430/non_2x/top-2d-cartoon-vector-illustration-on-white-background-hig-free-photo.jpg')",
                           backgroundSize: "cover",
                           backgroundRepeat: "no-repeat",
                         }}
@@ -123,7 +123,7 @@ const ChatWindow = () => {
                   className="profile"
                   style={{
                     backgroundImage:
-                      "URL('https://static.vecteezy.com/system/resources/previews/034/324/148/large_2x/front-view-of-an-animated-boy-standing-wearing-tshirt-character-design-free-photo.jpeg')",
+                      "URL('https://static.vecteezy.com/system/resources/previews/030/694/430/non_2x/top-2d-cartoon-vector-illustration-on-white-background-hig-free-photo.jpg')",
                     backgroundSize: "contain",
                   }}
                 ></div>
