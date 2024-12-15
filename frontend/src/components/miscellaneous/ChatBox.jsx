@@ -17,7 +17,7 @@ const ChatBox = () => {
   const [shakeMessage, setShakeMessage] = useState(false);
 
   useEffect(() => {
-    notificationSound.current = new Audio('chat_message_sound.mp3');
+    notificationSound.current = new Audio('https://sounddino.com/mp3/44/incoming-message-online-whatsapp.mp3');
   }, []);
 
   const useListenerMessage = () => {
