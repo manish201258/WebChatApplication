@@ -25,28 +25,34 @@ const UserRegister = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      await axios.post(`${BaseUrl}/register`, formData)
-      .then((res)=>{
-        setLoading(true);
-        if (res.status === 201) {
-          toast.success("Register Success");
-        } else if (res.status === 400) {
-          toast.error("Provide all details!");
-        } else if (res.status === 403) {
-          toast.warn("Credentials already exist!");
-        } else if (res.status === 500) {
-          toast.warn("Server issue");
-        }
-      })
+      setLoading(true);
   
-      
+      const res = await axios.post(`${BaseUrl}/register`, formData);
+  
+      if (res.status === 201) {
+        toast.success("Register Success");
+      }
     } catch (error) {
-      console.log("Client-side error in register:", error);
-      toast.error("Registration failed. Please try again.");
+      if (error.response) {
+        const status = error.response.status;
+        if (status === 400) {
+          toast.error("Provide all details!");
+        } else if (status === 403) {
+          toast.warn("Credentials already exist!");
+        } else if (status === 500) {
+          toast.warn("Server issue");
+        } else {
+          toast.error("Unexpected error occurred");
+        }
+      } else {
+        console.error("Client-side error in register:", error);
+        toast.error("Registration failed. Please try again.");
+      }
     } finally {
       setLoading(false);
     }
   };
+  
   
 
   return (

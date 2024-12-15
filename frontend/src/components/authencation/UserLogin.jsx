@@ -33,8 +33,22 @@ const UserLogin = () => {
           toast("Login Success")
       })
     } catch (error) {
-      console.log("client side error in login")
-    }
+          if (error.response) {
+            const status = error.response.status;
+            if (status === 400) {
+              toast.error("Provide all details!");
+            } else if (status === 403) {
+              toast.warn("Invalid Credentials!");
+            } else if (status === 500) {
+              toast.warn("Server issue");
+            } else {
+              toast.error("Unexpected error occurred");
+            }
+          } else {
+            console.error("Client-side error in login:", error);
+            toast.error("Login failed. Please try again.");
+          }
+        }
     finally{
       setLoading(false)
     }
