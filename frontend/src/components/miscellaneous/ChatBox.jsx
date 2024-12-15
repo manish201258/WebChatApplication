@@ -10,9 +10,9 @@ const ChatBox = () => {
   const { chatPerson, clicked, currentUser, blockedUsers, setClicked, loading, setLoading } = UseAuth();
   const lastMessageRef = useRef(null);
   const [message, setMessage] = useState('');
-  const [conversation, setConversation] = useState([]);
-  const [sendingLoading, setSendingLoading] = useState(false); 
-  const [fetchingLoading, setFetchingLoading] = useState(false);
+  const [conversation, setConversation] = useState([]); // Always initialize as an array
+  const [sendingLoading, setSendingLoading] = useState(false); // For sending message loader
+  const [fetchingLoading, setFetchingLoading] = useState(false); // For fetching conversation loader
   const notificationSound = useRef(null);
   const [shakeMessage, setShakeMessage] = useState(false);
 
@@ -20,31 +20,32 @@ const ChatBox = () => {
     notificationSound.current = new Audio('https://sounddino.com/mp3/44/incoming-message-online-whatsapp.mp3');
   }, []);
 
-
-  useEffect(() => {
+  const useListenerMessage = () => {
     const { socket } = UseSocketContext();
 
-    const handleNewMessage = (newMessage) => {
-      if (newMessage.receiverId === currentUser._id || newMessage.senderId === currentUser._id) {
+    useEffect(() => {
+      const handleNewMessage = (newMessage) => {
         setConversation((prevConversation) => [...prevConversation, newMessage]);
 
         setShakeMessage(true);
         if (notificationSound.current) {
           notificationSound.current.play();
         }
-      }
-    };
+      };
 
-    if (socket) {
-      socket.on('newMessage', handleNewMessage);
-    }
-
-    return () => {
       if (socket) {
-        socket.off('newMessage', handleNewMessage);
+        socket.on('newMessage', handleNewMessage);
       }
-    };
-  }, [currentUser._id, chatPerson]);
+
+      return () => {
+        if (socket) {
+          socket.off('newMessage', handleNewMessage);
+        }
+      };
+    }, [socket]);
+  };
+
+  useListenerMessage();
 
   const onChangeHandler = (e) => {
     setMessage(e.target.value);
@@ -52,6 +53,7 @@ const ChatBox = () => {
 
   const handleSubmitMessage = async (e) => {
     e.preventDefault();
+
     setSendingLoading(true);
 
     const newMessage = {
@@ -87,7 +89,7 @@ const ChatBox = () => {
   useEffect(() => {
     if (chatPerson) {
       const getChatPerson = async () => {
-        setFetchingLoading(true);
+        setFetchingLoading(true); // Start fetching loader
 
         try {
           const response = await axios.get(`${BaseUrl}/get/${chatPerson[0]._id}`, {
@@ -95,11 +97,12 @@ const ChatBox = () => {
               Authorization: `Bearer ${Cookies.get('token')}`,
             },
           });
+          // Ensure the response data is an array
           setConversation(Array.isArray(response.data) ? response.data : []);
         } catch (error) {
           console.error('Error fetching messages:', error);
         } finally {
-          setFetchingLoading(false);
+          setFetchingLoading(false); // End fetching loader
         }
       };
       getChatPerson();
