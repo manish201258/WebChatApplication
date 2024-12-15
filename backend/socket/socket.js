@@ -7,10 +7,16 @@ const server = http.createServer(app);
 
 const io = new Server(server, {
   cors: {
-    origin: ["http://localhost:3000", "https://webchatapplication-6il8.onrender.com", "http://localhost:5173", "https://web-chat-application-xi.vercel.app/"],
+    origin: [
+      "http://localhost:3000",
+      "https://webchatapplication-6il8.onrender.com",
+      "http://localhost:5173",
+      "https://web-chat-application-xi.vercel.app"
+    ],
     methods: ["GET", "POST"],
   },
 });
+
 
 const userSocketMap = {};
 

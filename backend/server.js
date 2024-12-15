@@ -4,7 +4,22 @@ const DBConnect = require("./models/db.js");
 const router = require("./router/route.js");
 const { app, server } = require('./socket/socket.js');
 
-app.use(cors())
+
+
+const corsOptions = {
+    origin: [
+      "http://localhost:3000",
+      "https://webchatapplication-6il8.onrender.com",
+      "http://localhost:5173",
+      "https://web-chat-application-xi.vercel.app"
+    ],
+    methods: ["GET", "POST", "PUT", "DELETE"],
+    credentials: true, // Allows cookies or authentication headers
+  };
+  
+  app.use(cors(corsOptions));
+
+  
 
 app.use(express.json());
 app.use("/auth/api", router);
