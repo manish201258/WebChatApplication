@@ -88,7 +88,7 @@ const ChatPage = () => {
   <div className="modal-dialog modal-dialog-centered">
     <div className="modal-content profile-model-content">
       <div className="modal-body profile-model-body"> 
-        <div className='profile-photo'style={{backgroundImage:"URL('https://static.vecteezy.com/system/resources/previews/034/324/148/large_2x/front-view-of-an-animated-boy-standing-wearing-tshirt-character-design-free-photo.jpeg')", backgroundSize:"cover", backgroundRepeat:"no-repeat"}}></div>
+        <div className='profile-photo'style={{backgroundImage:"URL('https://images.unsplash.com/photo-1606335192038-f5a05f761b3a?q=80&w=1964&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D')", backgroundSize:"cover", backgroundRepeat:"no-repeat"}}></div>
         <div className='m-3'>
           <p className='m-0 fw-bold'>Your Name</p>
           <p className='m-0'>{username}</p>
