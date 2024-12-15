@@ -10,9 +10,9 @@ const ChatBox = () => {
   const { chatPerson, clicked, currentUser, blockedUsers, setClicked, loading, setLoading } = UseAuth();
   const lastMessageRef = useRef(null);
   const [message, setMessage] = useState('');
-  const [conversation, setConversation] = useState([]); // Always initialize as an array
-  const [sendingLoading, setSendingLoading] = useState(false); // For sending message loader
-  const [fetchingLoading, setFetchingLoading] = useState(false); // For fetching conversation loader
+  const [conversation, setConversation] = useState([]); 
+  const [sendingLoading, setSendingLoading] = useState(false);
+  const [fetchingLoading, setFetchingLoading] = useState(false); 
   const notificationSound = useRef(null);
   const [shakeMessage, setShakeMessage] = useState(false);
 
@@ -53,18 +53,17 @@ const ChatBox = () => {
 
   const handleSubmitMessage = async (e) => {
     e.preventDefault();
-
     setSendingLoading(true);
-
+  
     const newMessage = {
       senderId: currentUser._id,
       receiverId: chatPerson[0]._id,
       message: message,
       createdAt: new Date(),
     };
-
+  
     setConversation((prevConversation) => [...prevConversation, newMessage]);
-
+  
     try {
       const response = await axios.post(
         `${BaseUrl}/send/${chatPerson[0]._id}`,
@@ -84,30 +83,31 @@ const ChatBox = () => {
       setSendingLoading(false);
     }
   };
+  
 
   // Fetch chat messages for the selected person
-  useEffect(() => {
-    if (chatPerson) {
-      const getChatPerson = async () => {
-        setFetchingLoading(true); // Start fetching loader
+useEffect(() => {
+  if (chatPerson) {
+    const getChatPerson = async () => {
+      setFetchingLoading(true);
 
-        try {
-          const response = await axios.get(`${BaseUrl}/get/${chatPerson[0]._id}`, {
-            headers: {
-              Authorization: `Bearer ${Cookies.get('token')}`,
-            },
-          });
-          // Ensure the response data is an array
-          setConversation(Array.isArray(response.data) ? response.data : []);
-        } catch (error) {
-          console.error('Error fetching messages:', error);
-        } finally {
-          setFetchingLoading(false); // End fetching loader
-        }
-      };
-      getChatPerson();
-    }
-  }, [chatPerson, clicked]);
+      try {
+        const response = await axios.get(`${BaseUrl}/get/${chatPerson[0]._id}`, {
+          headers: {
+            Authorization: `Bearer ${Cookies.get('token')}`,
+          },
+        });
+        setConversation(Array.isArray(response.data) ? response.data : []);
+      } catch (error) {
+        console.error('Error fetching messages:', error);
+      } finally {
+        setFetchingLoading(false);
+      }
+    };
+    getChatPerson();
+  }
+}, [chatPerson, clicked]);
+
 
   useEffect(() => {
     if (lastMessageRef.current) {
