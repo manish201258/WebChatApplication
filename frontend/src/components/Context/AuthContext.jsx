@@ -9,134 +9,146 @@ const AuthContext = createContext();
 export const AuthProvider = ({ children }) => {
 
   const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [currentUser,setCurrentUser] = useState(null)
-  const [sideUser,setsideUser] = useState([])
-  const [clicked,setClicked] = useState(null)
-  const [chatPerson,setChatPerson] = useState([])
-  const [blockedUsers,setBlockedUsers] = useState([]);
-  const [loading,setLoading] = useState(false)
+  const [currentUser, setCurrentUser] = useState(null);
+  const [sideUser, setsideUser] = useState([]);
+  const [clicked, setClicked] = useState(null);
+  const [chatPerson, setChatPerson] = useState([]);
+  const [blockedUsers, setBlockedUsers] = useState([]);
+  const [loading, setLoading] = useState(false);
 
-  const authenticate = (token) => {
+  const authenticate = async (token) => {
     Cookies.set('token', token, { expires: 30 });
     setIsAuthenticated(true);
-      userData();
-      userSideData();
+    setLoading(true);
+    try {
+      await userData();
+      await userSideData();
+    } finally {
+      setLoading(false);
+    }
   };
 
-  // Fetch user data and side user data if token exists
   useEffect(() => {
     const token = Cookies.get('token');
     setIsAuthenticated(!!token);
     if (token) {
-      userData();
-      userSideData();
+      setLoading(true);
+      Promise.all([userData(), userSideData()]).finally(() => {
+        setLoading(false);
+      });
     }
-  },[]);
+  }, []);
 
-  // Logout
   const logout = () => {
     Cookies.remove('token');
     setCurrentUser(null);
-    setCurrentUser([])
+    setsideUser([]);
     setIsAuthenticated(false);
-    toast.warn("Logout success")
+    toast.warn("Logout success");
   };
-  
-  // Currrent User Data
 
-  
-    const userData = async()=>{
-      const token = Cookies.get('token');
-      await axios.get(`${BaseUrl}/data`,{
-       headers:{
-         Authorization: `Bearer ${token}`
-       }
-     })
-     .then((res)=>{
-       setCurrentUser(res.data.data); 
-     })
-     }
+  const userData = async () => {
+    const token = Cookies.get('token');
+    setLoading(true);
+    try {
+      const res = await axios.get(`${BaseUrl}/data`, {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      });
+      setCurrentUser(res.data.data);
+    } finally {
+      setLoading(false);
+    }
+  };
 
+  const userSideData = async () => {
+    try {
+     await axios.get(`${BaseUrl}/sideuser`, {
+        headers: {
+          Authorization: `Bearer ${Cookies.get('token')}`
+        }
+      }).then((res)=>{
+        setLoading(true)
+        setsideUser(res.data);
+      })
+    } finally {
+      setLoading(false);
+    }
+  };
 
-  // Side Baruser
-    async function userSideData(){
-       await axios.get(`${BaseUrl}/sideuser`,{
-         headers:{
-           Authorization:`Bearer ${Cookies.get('token')}`
-         }
-       })
-       .then((res)=>{
-         setsideUser(res.data)
-       })
-     }
-
-  // Side User Clicked
   const sideClicked = (id) => {
     if (clicked === id) {
       setClicked(null);
-      setChatPerson([]); 
+      setChatPerson([]);
     } else {
       setClicked(id);
       const selectedChatPerson = sideUser.find((e) => e._id === id);
-      setChatPerson(selectedChatPerson ? [selectedChatPerson] : []); 
+      setChatPerson(selectedChatPerson ? [selectedChatPerson] : []);
     }
   };
 
-
-// User Manage
-const deleteConversation = async(id) => {
-  await axios.post(`${BaseUrl}/deleteconversation/${id}`,{},{
-    headers:{
-      Authorization:`Bearer ${Cookies.get('token')}`
+  const deleteConversation = async (id) => {
+    try {
+      await axios.post(`${BaseUrl}/deleteconversation/${id}`, {}, {
+        headers: {
+          Authorization: `Bearer ${Cookies.get('token')}`
+        }
+      })
+      .then(()=>{
+        setLoading(true)
+        setClicked(null);
+        userSideData();
+      })
+    } finally {
+      setLoading(false);
     }
-  })
-  .then(()=>{
-    setClicked(null)
-    userSideData();
-  })
-}
-const blockConversation = async (id) => {
-  try {
-    await axios.post(`${BaseUrl}/blockuser/${id}`, {}, {
-      headers: {
-        Authorization: `Bearer ${Cookies.get('token')}`
-      }
-    });
-    // Update the blocked users state
-    setBlockedUsers((prevBlocked) => [...prevBlocked, id]);
-  } catch (error) {
-    console.error("Error blocking user", error);
-  }
-};
+  };
 
-const unblockConversation = async (id) => {
-  try {
-    await axios.post(`${BaseUrl}/unblockuser/${id}`, {}, {
-      headers: {
-        Authorization: `Bearer ${Cookies.get('token')}`
-      }
-    });
-    // Update the blocked users state
-    setBlockedUsers((prevBlocked) => prevBlocked.filter(userId => userId !== id));
-  } catch (error) {
-    console.error("Error unblocking user", error);
-  }
-};
-
-
-const allBlockedData = async() => {
-  await axios.get(`${BaseUrl}/blockeddata`,{
-    headers:{
-      Authorization:`Bearer ${Cookies.get('token')}`
+  const blockConversation = async (id) => {
+    setLoading(true);
+    try {
+      await axios.post(`${BaseUrl}/blockuser/${id}`, {}, {
+        headers: {
+          Authorization: `Bearer ${Cookies.get('token')}`
+        }
+      });
+      setBlockedUsers((prevBlocked) => [...prevBlocked, id]);
+    } finally {
+      setLoading(false);
     }
-  })
-  .then((res)=>{
-    setBlockedUsers(res.data.blockedUsers)
-  })
-}
+  };
+
+  const unblockConversation = async (id) => {
+    setLoading(true);
+    try {
+      await axios.post(`${BaseUrl}/unblockuser/${id}`, {}, {
+        headers: {
+          Authorization: `Bearer ${Cookies.get('token')}`
+        }
+      });
+      setBlockedUsers((prevBlocked) => prevBlocked.filter(userId => userId !== id));
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const allBlockedData = async () => {
+    setLoading(true);
+    try {
+      const res = await axios.get(`${BaseUrl}/blockeddata`, {
+        headers: {
+          Authorization: `Bearer ${Cookies.get('token')}`
+        }
+      });
+      setBlockedUsers(res.data.blockedUsers);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
-    <AuthContext.Provider value={{ authenticate , isAuthenticated, currentUser,logout,sideUser,sideClicked,userSideData,clicked,chatPerson,deleteConversation,blockConversation,unblockConversation,allBlockedData,blockedUsers,setClicked,loading,setLoading}}>
+    <AuthContext.Provider value={{ authenticate, isAuthenticated, currentUser, logout, sideUser, sideClicked, userSideData, clicked, chatPerson, deleteConversation, blockConversation, unblockConversation, allBlockedData, blockedUsers, setClicked, loading, setLoading }}>
       {children}
     </AuthContext.Provider>
   );

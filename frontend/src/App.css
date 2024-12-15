@@ -399,6 +399,7 @@ background-color: #4fa4a9;
 @media (max-width: 750px) {
   .main-window{
     flex-direction: column;
+    padding-bottom: 2rem;
   }
   .menuDiv{
     padding: 2rem;
@@ -450,6 +451,12 @@ background-color: #4fa4a9;
   }
   .formstart form{
     /* gap: 1rem; */
+  }
+  .chat-box{
+height: 90%;
+  }
+  .chatWindowNav{
+    height: 10%;
   }
 
   }

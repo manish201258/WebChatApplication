@@ -15,6 +15,7 @@ const ChatContact = () => {
     userSideData,
     clicked,
     deleteConversation,
+    loading,setLoading
   } = UseAuth();
 
   const { onlineUsers } = UseSocketContext();
@@ -52,12 +53,24 @@ const ChatContact = () => {
             Authorization: `Bearer ${Cookies.get("token")}`,
           },
         }
-      ).then(()=>{
+      ).then((res)=>{
+        setLoading(true);
+        if(res.status===201)
         toast(`New User Added ${addUserUID}`)
       })
       setAddUserUID("");
     } catch (error) {
       console.error("Error adding user:", error.response?.data || error.message);
+      if(error.response.status===400)
+        toast.info("User Already added")
+      if(error.response.status===404)
+        toast.error("User Not Found")
+      if(error.response.status===404)
+        toast.warn("Server error")
+
+    }
+    finally{
+      setLoading(false)
     }
     
   };
@@ -104,21 +117,24 @@ const ChatContact = () => {
                   />
                 ))
               ) : (
-                <div>No chat found</div>
+                <div style={{textAlign:"center"}}>No chat found</div>
               )
-            ) : sideUser.length > 0 ? (
-              sideUser.map((user) => (
-                <UserCard
-                  key={user._id}i
-                  user={user}
-                  clicked={clicked}
-                  sideClicked={sideClicked}
-                  isOnline={isOnline(user._id)}
-                  deleteConversation={deleteConversation}
-                />
-              ))
+            ) : sideUser.length <= 0 ? (
+              <div style={{textAlign:"center"}}>No chat available</div>
             ) : (
-              <div>No chat available</div>
+
+                sideUser.map((user) => (
+                  <UserCard
+                    key={user._id}
+                    user={user}
+                    clicked={clicked}
+                    sideClicked={sideClicked}
+                    isOnline={isOnline(user._id)}
+                    deleteConversation={deleteConversation}
+                  />
+                ))
+             
+              
             )}
           </div>
         </div>
@@ -142,10 +158,21 @@ const ChatContact = () => {
                 value={addUserUID}
                 placeholder="Enter User Id..."
               />
-            
-                  <button type="submit" className="btn btn-danger btn-sm ps-3 pe-3">
+                {
+                  loading?
+                  (
+                    <button type="submit" className="btn btn-danger btn-sm ps-3 pe-3">
+                <Loader/>
+              </button>
+                  )
+                  :
+                  (
+<button type="submit" className="btn btn-danger btn-sm ps-3 pe-3">
                 Add
               </button>
+                  )
+                }
+                  
               
             </form>
           </div>
@@ -155,40 +182,56 @@ const ChatContact = () => {
   );
 };
 
-const UserCard = ({ user, clicked, sideClicked, isOnline, deleteConversation }) => (
-  <div
-    className="sideUser d-flex justify-content-between align-items-center"
-    onClick={() => sideClicked(user._id)}
-    style={{
-      backgroundColor: clicked === user._id ? "#D0E8C5" : "rgb(106 157 232)",
-      cursor: "pointer",
-      boxShadow: clicked === user._id ? "0px 0px 3px white" : "",
-    }}
-  >
-    <div className="userconatct d-flex align-items-center gap-4 ps-3">
-      <div
-        className="profile position-relative"
-        style={{
-          backgroundImage:
-            "url('https://images.unsplash.com/photo-1606335192038-f5a05f761b3a?q=80&w=1964&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D')",
-          backgroundSize: "contain",
-        }}
-      >
-        <div className={isOnline ? "isOnlineTag" : "isOfflineTag"}></div>
-      </div>
-      <p className="m-0 fw-2">{user.username.toUpperCase()}</p>
-    </div>
-    <div className="me-4 position-relative">
-      <i
-        className="fa-regular fa-trash-can"
-        style={{ color: "#991515" }}
-        onClick={(e) => {
-          e.stopPropagation();
-          deleteConversation(user._id);
-        }}
-      ></i>
-    </div>
-  </div>
-);
+const UserCard = ({ user, clicked, sideClicked, isOnline, deleteConversation }) => {
+  const [isDeleting, setIsDeleting] = useState(false);
 
+  const handleDelete = async (e) => {
+    e.stopPropagation();
+    setIsDeleting(true);
+    try {
+      await deleteConversation(user._id); 
+    } catch (error) {
+      console.error("Error deleting conversation:", error);
+    } finally {
+      setIsDeleting(false);
+    }
+  };
+
+  return (
+    <div
+      className="sideUser d-flex justify-content-between align-items-center"
+      onClick={() => sideClicked(user._id)}
+      style={{
+        backgroundColor: clicked === user._id ? "#D0E8C5" : "rgb(106 157 232)",
+        cursor: "pointer",
+        boxShadow: clicked === user._id ? "0px 0px 3px white" : "",
+      }}
+    >
+      <div className="userconatct d-flex align-items-center gap-4 ps-3">
+        <div
+          className="profile position-relative"
+          style={{
+            backgroundImage:
+              "url('https://images.unsplash.com/photo-1606335192038-f5a05f761b3a?q=80&w=1964&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D')",
+            backgroundSize: "contain",
+          }}
+        >
+          <div className={isOnline ? "isOnlineTag" : "isOfflineTag"}></div>
+        </div>
+        <p className="m-0 fw-2">{user.username.toUpperCase()}</p>
+      </div>
+      <div className="me-4 position-relative">
+        {isDeleting ? ( 
+          <Loader />
+        ) : (
+          <i
+            className="fa-regular fa-trash-can"
+            style={{ color: "#991515" }}
+            onClick={handleDelete}
+          ></i>
+        )}
+      </div>
+    </div>
+  );
+};
 export default ChatContact;

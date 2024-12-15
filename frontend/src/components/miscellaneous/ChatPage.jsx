@@ -45,10 +45,10 @@ const ChatPage = () => {
           <i className="fa-solid fa-lg fa-bell" style={{color:"#ffffff",cursor:"pointer"}} ></i>
           <i className="fa-brands fa-lg fa-github" style={{color:"#ffffff",cursor:"pointer"}}>
           </i>
+          <i className="fa-solid fa-lg fa-right-from-bracket" style={{color: "#201e1e",cursor:"pointer"}} onClick={
+            logout
+          }></i>
           </div>
-          <i className="fa-solid fa-lg fa-right-from-bracket" style={{color: "#201e1e",cursor:"pointer"}} onClick={()=>{
-            logout;
-          }}></i>
           </div>
           <hr className='hr2' style={{width:"2px" , transform:"rotate(180deg)", backgroundColor:"black"}}/>
           {

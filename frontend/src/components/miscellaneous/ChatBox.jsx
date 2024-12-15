@@ -4,17 +4,20 @@ import Cookies from 'js-cookie';
 import { UseAuth } from '../Context/AuthContext';
 import { UseSocketContext } from '../Context/SocketContext';
 import BaseUrl from '../BaseUrl';
+import Loader from './Loader';
 
 const ChatBox = () => {
-  const { chatPerson, clicked, currentUser, blockedUsers, setClicked } = UseAuth();
+  const { chatPerson, clicked, currentUser, blockedUsers, setClicked, loading, setLoading } = UseAuth();
   const lastMessageRef = useRef(null);
   const [message, setMessage] = useState('');
-  const [conversation, setConversation] = useState([]);
+  const [conversation, setConversation] = useState([]); // Always initialize as an array
+  const [sendingLoading, setSendingLoading] = useState(false); // For sending message loader
+  const [fetchingLoading, setFetchingLoading] = useState(false); // For fetching conversation loader
   const notificationSound = useRef(null);
-  const [shakeMessage,setShakeMessage] = useState(false)
+  const [shakeMessage, setShakeMessage] = useState(false);
 
   useEffect(() => {
-    notificationSound.current = new Audio('chat_message_sound.mp3'); 
+    notificationSound.current = new Audio('chat_message_sound.mp3');
   }, []);
 
   const useListenerMessage = () => {
@@ -23,8 +26,8 @@ const ChatBox = () => {
     useEffect(() => {
       const handleNewMessage = (newMessage) => {
         setConversation((prevConversation) => [...prevConversation, newMessage]);
-        
-        setShakeMessage(true)
+
+        setShakeMessage(true);
         if (notificationSound.current) {
           notificationSound.current.play().catch((err) => console.error('Error playing sound:', err));
         }
@@ -51,17 +54,19 @@ const ChatBox = () => {
   const handleSubmitMessage = async (e) => {
     e.preventDefault();
 
+    setSendingLoading(true);
+
     const newMessage = {
       senderId: currentUser._id,
       receiverId: chatPerson[0]._id,
       message: message,
-      createdAt: new Date(), // Adding current time to the message object
+      createdAt: new Date(),
     };
 
     setConversation((prevConversation) => [...prevConversation, newMessage]);
 
     try {
-      await axios.post(
+      const response = await axios.post(
         `${BaseUrl}/send/${chatPerson[0]._id}`,
         { message, createdAt: newMessage.createdAt },
         {
@@ -70,9 +75,13 @@ const ChatBox = () => {
           },
         }
       );
-      setMessage('');
+      if (response.status === 201) {
+        setMessage('');
+      }
     } catch (error) {
       console.error('Error sending message:', error.response?.data || error.message);
+    } finally {
+      setSendingLoading(false);
     }
   };
 
@@ -80,15 +89,20 @@ const ChatBox = () => {
   useEffect(() => {
     if (chatPerson) {
       const getChatPerson = async () => {
+        setFetchingLoading(true); // Start fetching loader
+
         try {
-          const res = await axios.get(`${BaseUrl}/get/${chatPerson[0]._id}`, {
+          const response = await axios.get(`${BaseUrl}/get/${chatPerson[0]._id}`, {
             headers: {
               Authorization: `Bearer ${Cookies.get('token')}`,
             },
           });
-          setConversation(res.data);
+          // Ensure the response data is an array
+          setConversation(Array.isArray(response.data) ? response.data : []);
         } catch (error) {
           console.error('Error fetching messages:', error);
+        } finally {
+          setFetchingLoading(false); // End fetching loader
         }
       };
       getChatPerson();
@@ -106,20 +120,29 @@ const ChatBox = () => {
     let hours = date.getHours();
     const minutes = date.getMinutes();
     const ampm = hours >= 12 ? 'PM' : 'AM';
-    hours = hours % 12;
+    hours = hours % 12 || 12;
     const minutesFormatted = minutes < 10 ? '0' + minutes : minutes;
     return `${hours}:${minutesFormatted} ${ampm}`;
   };
 
   // For mobile toggle chats
-  const toogleChat = () => {
+  const toggleChat = () => {
     setClicked(null);
   };
 
   return (
     <div className="chat-box position-relative">
       <div className="mainChats">
-        {conversation && conversation.length > 0 ? (
+        {fetchingLoading ? (
+          <div className="nullChatMessage">
+            <Loader />
+          </div>
+        ) : Array.isArray(conversation) && conversation.length === 0 ? (
+          <div className="nullChatMessage">
+            <p>Start new Conversation</p>
+          </div>
+        ) : (
+          Array.isArray(conversation) &&
           conversation.map((data, index) => (
             <div
               key={index}
@@ -132,12 +155,9 @@ const ChatBox = () => {
               <span>{formatTime(data.createdAt)}</span>
             </div>
           ))
-        ) : (
-          <div className="nullChatMessage">
-            <p>Start new Conversation</p>
-          </div>
         )}
       </div>
+
       {blockedUsers.includes(chatPerson[0]._id) ? (
         <div className="d-flex justify-content-center">
           <p className="fw-bold">Unblock to send a new message</p>
@@ -152,18 +172,21 @@ const ChatBox = () => {
             value={message}
             onChange={onChangeHandler}
             placeholder="Don't hesitate"
-            className=""
             required
           />
           <button type="submit" className="border-0 bg-transparent">
-            <i
-              className="fa-solid fa-lg fa-paper-plane"
-              style={{ color: 'rgb(42 43 41)' }}
-            ></i>
+            {sendingLoading ? (
+              <Loader />
+            ) : (
+              <i
+                className="fa-solid fa-lg fa-paper-plane"
+                style={{ color: 'rgb(42 43 41)' }}
+              ></i>
+            )}
           </button>
         </form>
       )}
-      <div className="toogleChats" onClick={toogleChat}>
+      <div className="toogleChats" onClick={toggleChat}>
         <i className="fa-solid fa-shuffle fa-lg" style={{ color: '#ffffff' }}></i>
       </div>
     </div>
