@@ -16,7 +16,7 @@ export const SocketContextProvider = ({ children }) => {
 
   useEffect(() => {
     if (isAuthenticated && currentUserId) {
-      const newSocket = io("https://your-deployed-server-url", {
+      const newSocket = io("https://webchatapplication-6il8.onrender.com", {
         query: {
           userId: currentUserId,
         },
