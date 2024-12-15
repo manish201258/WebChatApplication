@@ -29,7 +29,7 @@ const ChatBox = () => {
 
         setShakeMessage(true);
         if (notificationSound.current) {
-          notificationSound.current.play().catch((err) => console.error('Error playing sound:', err));
+          notificationSound.current.play();
         }
       };
 
