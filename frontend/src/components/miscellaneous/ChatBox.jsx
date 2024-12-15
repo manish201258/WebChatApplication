@@ -61,7 +61,7 @@ const ChatBox = () => {
       message: message,
       createdAt: new Date(),
     };
-  
+    if(chatPerson[0]._id===clicked)
     setConversation((prevConversation) => [...prevConversation, newMessage]);
   
     try {
