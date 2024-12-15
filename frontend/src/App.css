@@ -400,6 +400,7 @@ background-color: #4fa4a9;
   .main-window{
     flex-direction: column;
     padding-bottom: 2rem;
+    overflow-y: hidden;
   }
   .menuDiv{
     padding: 2rem;

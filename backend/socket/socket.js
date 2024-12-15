@@ -11,7 +11,7 @@ const io = new Server(server, {
       "http://localhost:3000",
       "https://webchatapplication-6il8.onrender.com",
       "http://localhost:5173",
-      "https://web-chat-application-xi.vercel.app"
+      "https://chatterrbox.vercel.app"
     ],
     methods: ["GET", "POST"],
   },
