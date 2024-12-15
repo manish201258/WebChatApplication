@@ -38,4 +38,4 @@ io.on("connection", (socket) => {
   });
 });
 
-module.exports = { io, server, getReceiverSocketId: (reciverId) => userSocketMap[reciverId] };
+module.exports = {app, io, server, getReceiverSocketId: (reciverId) => userSocketMap[reciverId] };
