@@ -14,7 +14,7 @@ const ChatBox = () => {
   const [shakeMessage,setShakeMessage] = useState(false)
 
   useEffect(() => {
-    notificationSound.current = new Audio('public/sounds/chat_message_sound.mp3'); 
+    notificationSound.current = new Audio('chat_message_sound.mp3'); 
   }, []);
 
   const useListenerMessage = () => {
